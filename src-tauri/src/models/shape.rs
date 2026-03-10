@@ -8,7 +8,7 @@ pub struct ShapeConfig {
 
     pub parameters: HashMap<String, f64>,
 
-    pub rotation: u16,
+    pub rotation: u8,
 
     #[serde(rename = "flipX")]
     pub flip_x: bool,
@@ -25,4 +25,11 @@ pub enum ShapeType {
     Triangle,
     Lshape,
     Trapezoid,
+}
+
+#[derive(Debug, Clone)]
+pub struct ShapeSvgData {
+    pub element: String,
+    pub width: f64,
+    pub height: f64,
 }
