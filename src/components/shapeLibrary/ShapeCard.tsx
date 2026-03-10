@@ -1,4 +1,4 @@
-import { ShapeDefinition } from "../types/shape";
+import { ShapeDefinition } from "../../types/shape";
 
 type Props = {
   shape: ShapeDefinition;

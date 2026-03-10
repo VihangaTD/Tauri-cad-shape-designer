@@ -1,5 +1,5 @@
-import { shapes } from "../shapes";
-import { ShapeType } from "../types/shape";
+import { shapes } from "../../shapes";
+import { ShapeType } from "../../types/shape";
 import ShapeCard from "./ShapeCard";
 
 type Props = {
