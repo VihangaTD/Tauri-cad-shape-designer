@@ -13,7 +13,7 @@ export default function Canvas({
   height = 600,
 }: CanvasProps) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <CanvasToolbar />
 
       <div className="mt-4">

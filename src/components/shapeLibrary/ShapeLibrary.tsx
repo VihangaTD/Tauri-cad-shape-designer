@@ -1,18 +1,33 @@
+import { Shapes } from "lucide-react";
 import { shapes } from "../../shapes";
-import { ShapeType } from "../../types/shape";
 import ShapeCard from "./ShapeCard";
+import type { ShapeType } from "../../types/shape";
 
-type Props = {
+type ShapeLibraryProps = {
   selected: ShapeType;
   onSelect: (shape: ShapeType) => void;
 };
 
-export default function ShapeLibrary({ selected, onSelect }: Props) {
+export default function ShapeLibrary({
+  selected,
+  onSelect,
+}: ShapeLibraryProps) {
   return (
-    <section className="border rounded-xl bg-white p-4">
-      <h2 className="font-semibold mb-4">Shape Library</h2>
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-4 flex items-start gap-3">
+        <div className="rounded-lg bg-slate-100 p-2">
+          <Shapes className="h-5 w-5 text-slate-700" />
+        </div>
 
-      <div className="space-y-2">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">Shape Library</h2>
+          <p className="text-sm text-slate-500">
+            Select a predefined shape to start designing.
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
         {shapes.map((shape) => (
           <ShapeCard
             key={shape.type}
