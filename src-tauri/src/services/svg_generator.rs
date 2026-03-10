@@ -7,10 +7,10 @@ use crate::shapes::{
     triangle::build_triangle_svg,
 };
 
-struct ShapeSvgData {
-    element: String,
-    width: f64,
-    height: f64,
+pub struct ShapeSvgData {
+    pub element: String,
+    pub width: f64,
+    pub height: f64,
 }
 
 pub fn generate_svg_document(shape: &ShapeInput) -> Result<String, String> {
@@ -32,23 +32,18 @@ pub fn generate_svg_document(shape: &ShapeInput) -> Result<String, String> {
     let center_x = canvas_width / 2.0;
     let center_y = canvas_height / 2.0;
 
-    let translate_x = padding;
-    let translate_y = padding;
-
     let scale_x = if shape.flip_x { -1.0 } else { 1.0 };
     let scale_y = if shape.flip_y { -1.0 } else { 1.0 };
 
     let transform = format!(
-        "translate({cx},{cy}) rotate({rot}) scale({sx},{sy}) translate({tx},{ty}) translate({neg_cx},{neg_cy})",
+        "translate({cx},{cy}) rotate({rot}) scale({sx},{sy}) translate({neg_half_w},{neg_half_h})",
         cx = center_x,
         cy = center_y,
         rot = shape.rotation,
         sx = scale_x,
         sy = scale_y,
-        tx = translate_x,
-        ty = translate_y,
-        neg_cx = -(shape_data.width / 2.0),
-        neg_cy = -(shape_data.height / 2.0),
+        neg_half_w = -(shape_data.width / 2.0),
+        neg_half_h = -(shape_data.height / 2.0),
     );
 
     let svg = format!(
@@ -99,10 +94,6 @@ pub(crate) fn validate_non_negative(value: f64, name: &str) -> Result<f64, Strin
     } else {
         Ok(value)
     }
-}
-
-pub(crate) fn stroke_style() -> &'static str {
-    r#"fill="none" stroke="black" stroke-width="2""#
 }
 
 pub(crate) fn filled_style() -> &'static str {
