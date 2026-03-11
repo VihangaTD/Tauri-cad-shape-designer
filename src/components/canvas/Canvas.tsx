@@ -1,14 +1,15 @@
 import CanvasToolbar from "./CanvasToolbar";
 import CanvasViewport from "./CanvasViewport";
+import type { ShapeConfig } from "../../types/shape";
 
 type CanvasProps = {
-  svgMarkup: string | null;
+  shapeConfig: ShapeConfig;
   width?: number;
   height?: number;
 };
 
 export default function Canvas({
-  svgMarkup,
+  shapeConfig,
   width = 900,
   height = 600,
 }: CanvasProps) {
@@ -18,7 +19,7 @@ export default function Canvas({
 
       <div className="mt-4">
         <CanvasViewport
-          svgMarkup={svgMarkup}
+          shapeConfig={shapeConfig}
           width={width}
           height={height}
         />

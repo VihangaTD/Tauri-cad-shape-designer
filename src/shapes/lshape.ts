@@ -1,33 +1,40 @@
-import { ShapeDefinition } from "../types/shape";
+import type { ShapeDefinition } from "../types/shape";
 
 export const lshape: ShapeDefinition = {
   type: "lshape",
   label: "L Shape",
 
   defaultParameters: {
-    outerWidth: 1200,
-    outerHeight: 800,
-    thickness: 300,
+    width: 400,
+    height: 200,
+    cutoutWidth: 100,
+    cutoutHeight: 100,
   },
 
   fields: [
     {
-      key: "outerWidth",
-      label: "Outer Width",
+      key: "width",
+      label: "Width",
       unit: "mm",
       min: 1,
     },
     {
-      key: "outerHeight",
-      label: "Outer Height",
+      key: "height",
+      label: "Height",
       unit: "mm",
       min: 1,
     },
     {
-      key: "thickness",
-      label: "Thickness",
+      key: "cutoutWidth",
+      label: "Cutout Width",
       unit: "mm",
-      min: 1,
+      min: 0,
+    },
+    {
+      key: "cutoutHeight",
+      label: "Cutout Height",
+      unit: "mm",
+      min: 0,
     },
   ],
 };

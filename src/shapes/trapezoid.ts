@@ -1,13 +1,13 @@
-import { ShapeDefinition } from "../types/shape";
+import type { ShapeDefinition } from "../types/shape";
 
 export const trapezoid: ShapeDefinition = {
   type: "trapezoid",
   label: "Trapezoid",
 
   defaultParameters: {
-    topWidth: 800,
-    bottomWidth: 1200,
-    height: 700,
+    topWidth: 100,
+    bottomWidth: 200,
+    height: 100,
   },
 
   fields: [

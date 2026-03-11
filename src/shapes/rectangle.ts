@@ -1,12 +1,12 @@
-import { ShapeDefinition } from "../types/shape";
+import type { ShapeDefinition } from "../types/shape";
 
 export const rectangle: ShapeDefinition = {
   type: "rectangle",
   label: "Rectangle",
 
   defaultParameters: {
-    width: 1200,
-    height: 800,
+    width: 100,
+    height: 50,
   },
 
   fields: [

@@ -1,18 +1,18 @@
-import { ShapeDefinition } from "../types/shape";
+import type { ShapeDefinition } from "../types/shape";
 
 export const triangle: ShapeDefinition = {
   type: "triangle",
   label: "Triangle",
 
   defaultParameters: {
-    base: 1200,
-    height: 800,
+    width: 150,
+    height: 100,
   },
 
   fields: [
     {
-      key: "base",
-      label: "Base",
+      key: "width",
+      label: "Width",
       unit: "mm",
       min: 1,
     },
