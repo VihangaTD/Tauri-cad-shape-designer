@@ -1,14 +1,17 @@
 use std::collections::HashMap;
 
+use crate::models::shape::ShapeSvgData;
 use crate::services::svg_generator::{
-    create_polygon, filled_style, pack, read_required, validate_non_negative, validate_positive, ShapeSvgData,
+    create_polygon, filled_style, pack, read_required, validate_non_negative, validate_positive,
 };
 
 pub fn build_lshape_svg(parameters: &HashMap<String, f64>) -> Result<ShapeSvgData, String> {
     let width = validate_positive(read_required(parameters, "width")?, "width")?;
     let height = validate_positive(read_required(parameters, "height")?, "height")?;
-    let cutout_width = validate_non_negative(read_required(parameters, "cutoutWidth")?, "cutoutWidth")?;
-    let cutout_height = validate_non_negative(read_required(parameters, "cutoutHeight")?, "cutoutHeight")?;
+    let cutout_width =
+        validate_non_negative(read_required(parameters, "cutoutWidth")?, "cutoutWidth")?;
+    let cutout_height =
+        validate_non_negative(read_required(parameters, "cutoutHeight")?, "cutoutHeight")?;
 
     if cutout_width >= width {
         return Err("cutoutWidth must be smaller than width".to_string());

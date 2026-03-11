@@ -2,12 +2,12 @@ import { Settings2, Ruler } from "lucide-react";
 import RotationControls from "./RotationControls";
 import FlipControls from "./FlipControls";
 import { shapeRegistry } from "../../shapes";
-import type { ShapeConfig } from "../../types/shape";
+import type { RotationAngle, ShapeConfig } from "../../types/shape";
 
 type ShapeEditorProps = {
   config: ShapeConfig;
   onParameterChange: (key: string, value: number) => void;
-  onRotationChange: (rotation: 0 | 90 | 180 | 270) => void;
+  onRotationChange: (rotation: RotationAngle) => void;
   onFlipX: () => void;
   onFlipY: () => void;
 };
@@ -57,7 +57,9 @@ export default function ShapeEditor({
                 <input
                   id={field.key}
                   type="number"
-                  min={field.min ?? 1}
+                  min={field.min ?? 0}
+                  max={field.max}
+                  step={field.step ?? 1}
                   value={config.parameters[field.key] ?? ""}
                   onChange={(e) =>
                     onParameterChange(field.key, Number(e.target.value))

@@ -2,11 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ShapeConfig } from "../types/shape";
 import { generateSvg } from "../services/tauri/generateSvg";
 import {
+  clearCanvas,
   createImageFromSvg,
   drawCenteredImage,
+  drawPlaceholder,
   getCanvas2DContext,
   resizeCanvasToDisplaySize,
-  clearCanvas,
 } from "../utils/canvasHelpers";
 
 interface UseCanvasRendererOptions {
@@ -39,8 +40,13 @@ export function useCanvasRenderer({
 
     setIsLoading(true);
     setError(null);
+    setSvg("");
 
     try {
+      resizeCanvasToDisplaySize(canvas);
+      const ctx = getCanvas2DContext(canvas);
+      clearCanvas(ctx, canvas, "#ffffff");
+
       const svgString = await generateSvg(shapeConfig);
 
       if (currentVersion !== renderVersionRef.current) return;
@@ -52,7 +58,6 @@ export function useCanvasRenderer({
       if (currentVersion !== renderVersionRef.current) return;
 
       resizeCanvasToDisplaySize(canvas);
-      const ctx = getCanvas2DContext(canvas);
 
       drawCenteredImage(ctx, canvas, image, image.width, image.height, {
         padding: 24,
@@ -63,13 +68,21 @@ export function useCanvasRenderer({
 
       if (currentVersion !== renderVersionRef.current) return;
 
-      setError(
-        err instanceof Error ? err.message : "Failed to render canvas preview."
-      );
+      const message =
+        err instanceof Error ? err.message : "Failed to render canvas preview.";
+
+      setError(message);
 
       const ctx = canvas.getContext("2d");
       if (ctx) {
+        resizeCanvasToDisplaySize(canvas);
         clearCanvas(ctx, canvas, "#ffffff");
+        drawPlaceholder(
+          ctx,
+          canvas.width,
+          canvas.height,
+          "Preview render failed"
+        );
       }
     } finally {
       if (currentVersion === renderVersionRef.current) {
@@ -86,16 +99,15 @@ export function useCanvasRenderer({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const handleResize = () => {
-      void renderNow();
-    };
-
     const observer = new ResizeObserver(() => {
       void renderNow();
     });
 
-    observer.observe(canvas);
+    const handleResize = () => {
+      void renderNow();
+    };
 
+    observer.observe(canvas);
     window.addEventListener("resize", handleResize);
 
     return () => {

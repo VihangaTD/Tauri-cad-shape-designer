@@ -8,7 +8,7 @@ pub struct ShapeConfig {
 
     pub parameters: HashMap<String, f64>,
 
-    pub rotation: u8,
+    pub rotation: u16,
 
     #[serde(rename = "flipX")]
     pub flip_x: bool,
@@ -17,7 +17,7 @@ pub struct ShapeConfig {
     pub flip_y: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum ShapeType {
     Rectangle,

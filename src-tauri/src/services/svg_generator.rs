@@ -1,4 +1,4 @@
-use crate::models::shape::ShapeInput;
+use crate::models::shape::{ShapeConfig, ShapeSvgData, ShapeType};
 use crate::shapes::{
     circle::build_circle_svg,
     lshape::build_lshape_svg,
@@ -7,22 +7,13 @@ use crate::shapes::{
     triangle::build_triangle_svg,
 };
 
-pub struct ShapeSvgData {
-    pub element: String,
-    pub width: f64,
-    pub height: f64,
-}
-
-pub fn generate_svg_document(shape: &ShapeInput) -> Result<String, String> {
-    let shape_data = match shape.shape_type.as_str() {
-        "rectangle" => build_rectangle_svg(&shape.parameters)?,
-        "circle" => build_circle_svg(&shape.parameters)?,
-        "triangle" => build_triangle_svg(&shape.parameters)?,
-        "lshape" => build_lshape_svg(&shape.parameters)?,
-        "trapezoid" => build_trapezoid_svg(&shape.parameters)?,
-        other => {
-            return Err(format!("Unsupported shape type: {}", other));
-        }
+pub fn generate_svg_document(shape: &ShapeConfig) -> Result<String, String> {
+    let shape_data = match shape.shape_type {
+        ShapeType::Rectangle => build_rectangle_svg(&shape.parameters)?,
+        ShapeType::Circle => build_circle_svg(&shape.parameters)?,
+        ShapeType::Triangle => build_triangle_svg(&shape.parameters)?,
+        ShapeType::Lshape => build_lshape_svg(&shape.parameters)?,
+        ShapeType::Trapezoid => build_trapezoid_svg(&shape.parameters)?,
     };
 
     let padding = 40.0;
@@ -97,7 +88,7 @@ pub(crate) fn validate_non_negative(value: f64, name: &str) -> Result<f64, Strin
 }
 
 pub(crate) fn filled_style() -> &'static str {
-    r#"fill="#dbeafe" stroke="black" stroke-width="2""#
+    r##"fill="#dbeafe" stroke="black" stroke-width="1""##
 }
 
 pub(crate) fn pack(element: String, width: f64, height: f64) -> Result<ShapeSvgData, String> {

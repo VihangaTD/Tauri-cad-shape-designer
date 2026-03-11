@@ -33,8 +33,14 @@ export function resizeCanvasToDisplaySize(
   canvas: HTMLCanvasElement,
   devicePixelRatio = window.devicePixelRatio || 1
 ): boolean {
-  const displayWidth = Math.floor(canvas.clientWidth * devicePixelRatio);
-  const displayHeight = Math.floor(canvas.clientHeight * devicePixelRatio);
+  const displayWidth = Math.max(
+    1,
+    Math.floor(canvas.clientWidth * devicePixelRatio)
+  );
+  const displayHeight = Math.max(
+    1,
+    Math.floor(canvas.clientHeight * devicePixelRatio)
+  );
 
   const needResize =
     canvas.width !== displayWidth || canvas.height !== displayHeight;
@@ -54,15 +60,18 @@ export function calculateFit(
   sourceHeight: number,
   padding = 24
 ): FitResult {
+  const safeSourceWidth = Math.max(sourceWidth, 1);
+  const safeSourceHeight = Math.max(sourceHeight, 1);
+
   const safeCanvasWidth = Math.max(canvasWidth - padding * 2, 1);
   const safeCanvasHeight = Math.max(canvasHeight - padding * 2, 1);
 
-  const widthScale = safeCanvasWidth / sourceWidth;
-  const heightScale = safeCanvasHeight / sourceHeight;
+  const widthScale = safeCanvasWidth / safeSourceWidth;
+  const heightScale = safeCanvasHeight / safeSourceHeight;
   const scale = Math.min(widthScale, heightScale);
 
-  const drawWidth = sourceWidth * scale;
-  const drawHeight = sourceHeight * scale;
+  const drawWidth = safeSourceWidth * scale;
+  const drawHeight = safeSourceHeight * scale;
 
   const offsetX = (canvasWidth - drawWidth) / 2;
   const offsetY = (canvasHeight - drawHeight) / 2;
@@ -105,6 +114,30 @@ export function drawCenteredImage(
   );
 
   return fit;
+}
+
+export function drawPlaceholder(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  message: string
+): void {
+  ctx.save();
+
+  ctx.fillStyle = "#f8fafc";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(16, 16, Math.max(width - 32, 0), Math.max(height - 32, 0));
+
+  ctx.fillStyle = "#64748b";
+  ctx.font = "16px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(message, width / 2, height / 2);
+
+  ctx.restore();
 }
 
 export function createImageFromSvg(svg: string): Promise<HTMLImageElement> {

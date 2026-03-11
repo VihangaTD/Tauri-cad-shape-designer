@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
+use crate::models::shape::ShapeSvgData;
 use crate::services::svg_generator::{
-    filled_style, pack, read_required, validate_positive, ShapeSvgData,
+    filled_style, pack, read_required, validate_positive,
 };
 
 pub fn build_rectangle_svg(parameters: &HashMap<String, f64>) -> Result<ShapeSvgData, String> {

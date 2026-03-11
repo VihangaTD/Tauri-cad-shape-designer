@@ -7,41 +7,42 @@ import ShapeEditor from "./components/shapeEditor/ShapeEditor";
 import Canvas from "./components/canvas/Canvas";
 import ExportPanel from "./components/exportPanel/ExportPanel";
 
-import { shapeRegistry } from "./shapes";
-import type { ShapeConfig, ShapeType } from "./types/shape";
+import { getDefaultShapeConfig, shapeRegistry } from "./shapes";
+import type { RotationAngle, ShapeConfig, ShapeType } from "./types/shape";
+
+function sanitizeParameterValue(value: number, min = 0): number {
+  if (!Number.isFinite(value) || Number.isNaN(value)) {
+    return min;
+  }
+
+  return Math.max(min, value);
+}
 
 export default function Page() {
-  const [config, setConfig] = useState<ShapeConfig>({
-    type: "rectangle",
-    parameters: { ...shapeRegistry.rectangle.defaultParameters },
-    rotation: 0,
-    flipX: false,
-    flipY: false,
-  });
+  const [config, setConfig] = useState<ShapeConfig>(
+    getDefaultShapeConfig("rectangle")
+  );
 
   const [isExporting] = useState(false);
 
   const handleSelectShape = (shape: ShapeType) => {
-    setConfig({
-      type: shape,
-      parameters: { ...shapeRegistry[shape].defaultParameters },
-      rotation: 0,
-      flipX: false,
-      flipY: false,
-    });
+    setConfig(getDefaultShapeConfig(shape));
   };
 
   const handleParameterChange = (key: string, value: number) => {
+    const field = shapeRegistry[config.type].fields.find((item) => item.key === key);
+    const min = field?.min ?? 0;
+
     setConfig((prev) => ({
       ...prev,
       parameters: {
         ...prev.parameters,
-        [key]: value,
+        [key]: sanitizeParameterValue(value, min),
       },
     }));
   };
 
-  const handleRotationChange = (rotation: 0 | 90 | 180 | 270) => {
+  const handleRotationChange = (rotation: RotationAngle) => {
     setConfig((prev) => ({
       ...prev,
       rotation,
@@ -78,31 +79,12 @@ export default function Page() {
     console.log("Export Detailed DXF", config);
   };
 
-  const svgMarkup = `
-    <svg
-      width="500"
-      height="350"
-      viewBox="0 0 500 350"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        x="80"
-        y="70"
-        width="340"
-        height="210"
-        fill="none"
-        stroke="#0f172a"
-        stroke-width="4"
-      />
-    </svg>
-  `;
-
   return (
     <main className="min-h-screen bg-slate-100 p-4">
       <div className="space-y-2">
         <header className="rounded-2xl border border-slate-200 bg-white px-4 py-2 shadow-sm">
           <h1 className="text-2xl font-bold text-slate-900">
-           Shape Designer
+            Shape Designer
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             Select a shape, edit dimensions, apply transformations, preview the
@@ -119,7 +101,7 @@ export default function Page() {
           </div>
 
           <div>
-            <Canvas svgMarkup={svgMarkup} />
+            <Canvas shapeConfig={config} />
           </div>
 
           <div className="space-y-2">
@@ -133,7 +115,7 @@ export default function Page() {
 
             <div className="max-w-full">
               <ExportPanel
-                isDisabled={!svgMarkup}
+                isDisabled={false}
                 isExporting={isExporting}
                 onExportPng={handleExportPng}
                 onExportDetailedPng={handleExportDetailedPng}

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Monitor } from "lucide-react";
+import { useCanvasRenderer } from "../../hooks/useCanvasRenderer";
+import type { ShapeConfig } from "../../types/shape";
 
 type CanvasViewportProps = {
-  svgMarkup: string | null;
+  shapeConfig: ShapeConfig;
   width?: number;
   height?: number;
 };
@@ -10,74 +11,21 @@ type CanvasViewportProps = {
 type RenderStatus = "idle" | "rendering" | "ready" | "error";
 
 export default function CanvasViewport({
-  svgMarkup,
+  shapeConfig,
   width = 900,
   height = 600,
 }: CanvasViewportProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [status, setStatus] = useState<RenderStatus>("idle");
+  const { canvasRef, svg, isLoading, error } = useCanvasRenderer({
+    shapeConfig,
+  });
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (!svgMarkup) {
-      setStatus("idle");
-      drawPlaceholder(context, canvas.width, canvas.height, "No preview available");
-      return;
-    }
-
-    let disposed = false;
-    setStatus("rendering");
-
-    const blob = new Blob([svgMarkup], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-
-    image.onload = () => {
-      if (disposed) return;
-
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      const fitted = getContainSize(
-        image.width || canvas.width,
-        image.height || canvas.height,
-        canvas.width,
-        canvas.height
-      );
-
-      const dx = (canvas.width - fitted.width) / 2;
-      const dy = (canvas.height - fitted.height) / 2;
-
-      context.drawImage(image, dx, dy, fitted.width, fitted.height);
-      setStatus("ready");
-      URL.revokeObjectURL(url);
-    };
-
-    image.onerror = () => {
-      if (disposed) return;
-
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      drawPlaceholder(context, canvas.width, canvas.height, "Preview render failed");
-      setStatus("error");
-      URL.revokeObjectURL(url);
-    };
-
-    image.src = url;
-
-    return () => {
-      disposed = true;
-      URL.revokeObjectURL(url);
-    };
-  }, [svgMarkup]);
+  const status: RenderStatus = error
+    ? "error"
+    : isLoading
+    ? "rendering"
+    : svg
+    ? "ready"
+    : "idle";
 
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
@@ -90,12 +38,20 @@ export default function CanvasViewport({
         <StatusBadge status={status} />
       </div>
 
-      <canvas
-        ref={canvasRef}
-        width={width}
-        height={height}
-        className="block h-auto w-full"
-      />
+      <div style={{ width: "100%", height }}>
+        <canvas
+          ref={canvasRef}
+          width={width}
+          height={height}
+          className="block h-full w-full"
+        />
+      </div>
+
+      {error && (
+        <div className="border-t border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
+          {error}
+        </div>
+      )}
     </div>
   );
 }
@@ -134,46 +90,4 @@ function StatusBadge({ status }: { status: RenderStatus }) {
       Idle
     </span>
   );
-}
-
-function getContainSize(
-  sourceWidth: number,
-  sourceHeight: number,
-  maxWidth: number,
-  maxHeight: number
-) {
-  const sourceRatio = sourceWidth / sourceHeight;
-  const targetRatio = maxWidth / maxHeight;
-
-  if (sourceRatio > targetRatio) {
-    return {
-      width: maxWidth,
-      height: maxWidth / sourceRatio,
-    };
-  }
-
-  return {
-    width: maxHeight * sourceRatio,
-    height: maxHeight,
-  };
-}
-
-function drawPlaceholder(
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  message: string
-) {
-  context.fillStyle = "#f8fafc";
-  context.fillRect(0, 0, width, height);
-
-  context.strokeStyle = "#cbd5e1";
-  context.lineWidth = 1;
-  context.strokeRect(16, 16, width - 32, height - 32);
-
-  context.fillStyle = "#64748b";
-  context.font = "16px sans-serif";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(message, width / 2, height / 2);
 }
